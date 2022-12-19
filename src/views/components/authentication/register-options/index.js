@@ -22,9 +22,9 @@ const RegisterOptions = ()=>{
         cities = data;
     
     const roles = [
-        {id:2,name:"Restaurant"},
-        {id:3,name:"Courier"},
-        {id:4,name:"Client"}
+        {id:1,name:"Admin"},
+        {id:2,name:"Cashier"},
+        {id:3,name:"Client"}
     ];
     
     return [cities,roles];

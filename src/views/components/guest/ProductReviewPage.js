@@ -38,9 +38,9 @@ const ProductReviewPage = () => {
                 
                 <Grid item xs={12} md={5} spacing={3}>
                     <MainCard>
-                        <Typography variant="body2">
+                        {/* <Typography variant="body2">
                             call us 0646568956
-                        </Typography>
+                        </Typography> */}
                         <Typography variant="body2">
                             <Button>Order Now</Button>
                         </Typography>

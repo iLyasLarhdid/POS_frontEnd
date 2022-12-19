@@ -37,13 +37,13 @@ const pages = {
             url: '/addProduct',
             icon: icons.IconPackage
         },
-        {
-            id: 'add restaurants',
-            title: 'add restaurants',
-            type: 'item',
-            url: '/viewRestaurants',
-            icon: icons.IconPackage
-        },
+        // {
+        //     id: 'add restaurants',
+        //     title: 'add restaurants',
+        //     type: 'item',
+        //     url: '/viewRestaurants',
+        //     icon: icons.IconPackage
+        // },
         {
             id: 'view users',
             title: 'view users',

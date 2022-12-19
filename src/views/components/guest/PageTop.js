@@ -15,7 +15,7 @@ const PageTop =()=>{
                 <Grid item xs={12}>
                     <Grid container spacing={gridSpacing}>
                         <Grid item lg={6} md={6} sm={6} xs={12} style={{ height:"500px"  }}>
-                            <h1 style={{ marginTop:'20%', color:"orangered" }}><b>get food to your house now</b></h1>
+                            <h1 style={{ marginTop:'20%', color:"orangered" }}><b>The best Products</b></h1>
                             <Box component="form" noValidate autoComplete="off">
                                 <FormControl sx={{ width: matchDownSM ? '80vw':'40vw' }}>
                                     <OutlinedInput placeholder="Please enter text" />

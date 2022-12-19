@@ -40,7 +40,7 @@ const Header = () => {
                         Cart {cookies.cart && cookies.cart.length}
                 </Button>
                 <Button variant="text" onClick={()=>history.push("/products")} sx={{ borderRadius: '12px' }}>
-                        Food
+                        Products
                 </Button>
                 <Button variant="contained" onClick={()=>history.push("/login")} sx={{ borderRadius: '12px' }}>
                         Login

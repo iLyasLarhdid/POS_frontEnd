@@ -79,7 +79,7 @@ const ProductCard = ({product})=>{
             <CardActionArea onClick={()=>history.push(`/product/${product.id}`)}>
                 <CardMedia
                 component="img"
-                height="140"
+                height="200"
                 image={product.pictures.length >0 ? `${config.host}/upload/viewFile/${product.pictures[0].title}` : ''}
                 alt="product image"
                 />
@@ -95,7 +95,7 @@ const ProductCard = ({product})=>{
                         <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> {product.price}DH</b>
                     }
                 </Typography>
-                <Typography>{product.discount && <Chip label={`Discount ${product.discount.percentage}%`} color="warning" />}</Typography>
+                <Typography style={{ position:"absolute", top:"1px", right:"1px" }}>{product.discount && <b><Chip label={`Discount ${product.discount.percentage}%`} color="warning" /></b>}</Typography>
                 <Typography variant="body2" color="text.secondary">
                     {product.description.substring(0,50)}...
                 </Typography>

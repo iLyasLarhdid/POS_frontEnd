@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Grid, Input, MenuItem, Select } from "@mui/material";
+import { Button, Checkbox, CircularProgress, FormControlLabel, Grid, Input, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { gridSpacing } from "store/constant";
@@ -22,6 +22,7 @@ const fetchData = async (key)=>{
 const Cart = ()=>{
     const [cookies,setCookies] = useCookies();
     const [phoneNumber, setPhoneNumber] = useState("+212");
+    const [delivery, setDelivery] = useState(false);
     const [address, setAddress] = useState("");
     const [city, setCity] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
@@ -32,14 +33,13 @@ const Cart = ()=>{
 
     const addProduct = (values) => {
         console.log(values);
-
         enqueueSnackbar('saving the product!', {
             variant: 'info',
             action:()=><CircularProgress color="success" />,
             key: 100}
             );
 
-        const productsDtoList = cookies.cart.map((product)=>{return {id:product[0],quantity:product[2]}});
+        const productsDtoList = cookies.cart && cookies.cart.map((product)=>{return {id:product[0],quantity:product[2]}});
         const cityId = city;
 
         const url = `${config.host}/api/v1/orders`;
@@ -93,36 +93,43 @@ const Cart = ()=>{
                 </Grid>
             );
         })}
+        
         <Grid item xs={12} md={12}>
             <Grid center spacing={gridSpacing} style={{ marginTop:"2em" }}>
-                <div>Address : 
+                {
+                delivery && 
+                <>
+                    <div>Address : 
                     <Input value={address} onChange={(values)=>setAddress(values.target.value)} />
-                </div>
-                <div style={{ marginTop:"2em" }}>Phone N° : 
-                    <Input value={phoneNumber} onChange={(values)=>setPhoneNumber(values.target.value)} />
-                </div>
-                <div style={{ marginTop:"2em" }}>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={city}
-                        autoWidth
-                        label="restaurant"
-                        name="restaurant"
-                        onChange={(values)=>setCity(values.target.value)}
-                    >
-                        <MenuItem value={0} key={20} disabled>select city</MenuItem>
-                        {data && 
-                            data.map(city=>
-                                <MenuItem value={city.id} key={city.id}>     
-                                    {city.name}
-                                </MenuItem>
-                            )
-                        }
-                    
-                    </Select>
-                </div>
-                <Button disabled={(phoneNumber.length<10 || !cookies.cart.length>0 || address === "" || city === 0  )?true:false} variant='outlined' color='primary' style={{ marginTop:"2em" }}onClick={addProduct}>Order now</Button>
+                    </div>
+                    <div style={{ marginTop:"2em" }}>Phone N° : 
+                        <Input value={phoneNumber} onChange={(values)=>setPhoneNumber(values.target.value)} />
+                    </div>
+                    <div style={{ marginTop:"2em" }}>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={city}
+                            autoWidth
+                            label="city"
+                            name="city"
+                            onChange={(values)=>setCity(values.target.value)}
+                        >
+                            <MenuItem value={0} key={20} disabled>select city</MenuItem>
+                            {data && 
+                                data.map(city=>
+                                    <MenuItem value={city.id} key={city.id}>     
+                                        {city.name}
+                                    </MenuItem>
+                                )
+                            }
+                        
+                        </Select>
+                    </div>
+                </>
+                }
+                <FormControlLabel control={<Checkbox onClick={()=>setDelivery(old=>!old)}/>} label="Home delivery" /><br/>
+                <Button disabled={(delivery && (phoneNumber.length<10 || !cookies.cart.length>0 || address === "" || city === 0)  )?true:false} variant='outlined' color='primary' style={{ marginTop:"2em" }}onClick={addProduct}>Order now</Button>
             </Grid>
         </Grid>
     </Grid>

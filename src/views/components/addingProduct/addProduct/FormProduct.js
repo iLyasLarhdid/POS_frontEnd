@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCookies } from "react-cookie";
 import { useQuery } from "react-query";
-import { Button, Card, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, OutlinedInput, Select, TextField, useTheme } from '@mui/material';
+import { Button, Card, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, OutlinedInput, Select, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 import config from 'config';
 
@@ -26,7 +26,6 @@ const FormProduct = ({product, fileList, setFileList})=>{
     //get the id from index page and retrieve data based on it
     const [cookie] = useCookies([]);
     const scriptedRef = useScriptRef();
-    const theme = useTheme();
     const { enqueueSnackbar } = useSnackbar();
 
     const {data} = useQuery(['product_options',cookie.smailToken],fetchData);
@@ -76,7 +75,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
         const name = values.title;
         const price = values.price;
         const description = values.description;
-        const restaurantId = values.restaurant;
+        //const restaurantId = values.restaurant;
         const productTypeIds = values.category;
         const discountDto = {percentage:values.discount,endDate:values.endDate};;
         const url = `${config.host}/api/v1/products`;
@@ -88,7 +87,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
                 'Content-Type': 'application/json',
                 'Authorization': cookie.smailToken
             },
-            body: JSON.stringify({ name, price, description, restaurantId, productTypeIds, discountDto })
+            body: JSON.stringify({ name, price, description, productTypeIds, discountDto })
             })
             .then((response) => {
                 console.log(response);
@@ -159,7 +158,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
         const name = values.title;
         const price = values.price;
         const description = values.description;
-        const restaurantId = values.restaurant;
+        //const restaurantId = values.restaurant;
         const productTypeIds = values.category;
         const discountDto = {percentage:values.discount,endDate:values.endDate};;
         const url = `${config.host}/api/v1/products`;
@@ -171,7 +170,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
                 'Content-Type': 'application/json',
                 'Authorization': cookie.smailToken
             },
-            body: JSON.stringify({ id, name, price, description, restaurantId, productTypeIds, discountDto })
+            body: JSON.stringify({ id, name, price, description, productTypeIds, discountDto })
             })
             .then((response) => {
                 console.log(response);
@@ -223,7 +222,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
                     title: product ? product.name : "",
                     price:  product ? product.price : "",
                     description: product ? product.description : "",
-                    restaurant: product ? product.restaurant.id : 0,
+                    //restaurant: product ? product.restaurant.id : 0,
                     category: product ? product.types.map((type)=>type.id) : [],
                     discount: product && product.discount!=null ? product.discount.percentage : 0,
                     endDate:product && product.discount!=null ? product.discount.endDate : "",
@@ -234,7 +233,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
                     price: Yup.number().min(1).required('Price is required'),
                     discount: Yup.number().min(0).max(100).required('discount is required'),
                     category: Yup.array().required('category is required'),
-                    restaurant: Yup.string().max(500).required('restaurant is required'),
+                    //restaurant: Yup.string().max(500).required('restaurant is required'),
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
@@ -255,7 +254,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit}>
-                        <FormControl fullWidth error={Boolean(touched.title && errors.title)} sx={{ ...theme.typography.customInput }}>
+                        <FormControl fullWidth error={Boolean(touched.title && errors.title)} style={{ marginBottom:"1em" }}>
                             <InputLabel htmlFor="outlined-adornment-email-login">Title</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-title-login"
@@ -274,7 +273,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
                             )}
                         </FormControl>
 
-                        <FormControl fullWidth error={Boolean(touched.price && errors.price)} sx={{ ...theme.typography.customInput }}>
+                        <FormControl fullWidth error={Boolean(touched.price && errors.price)} style={{ marginBottom:"1em" }}>
                             <InputLabel htmlFor="outlined-adornment-email-login">Price</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email-login"
@@ -292,17 +291,16 @@ const FormProduct = ({product, fileList, setFileList})=>{
                                 </FormHelperText>
                             )}
                         </FormControl>
-
-                            <InputLabel htmlFor="outlined-adornment-email-login">Description</InputLabel>
-                        <FormControl fullWidth error={Boolean(touched.description && errors.description)} sx={{ ...theme.typography.customInput }}>
+                        <FormControl fullWidth error={Boolean(touched.description && errors.description)} style={{ marginBottom:"1em" }}>
+                            <InputLabel id="Desc">Description</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-description"
+                                id="Desc"
                                 type="text"
                                 value={values.description}
                                 name="description"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
-                                label="description"
+                                label="Description"
                                 inputProps={{}}
                                 multiline
                             />
@@ -313,7 +311,7 @@ const FormProduct = ({product, fileList, setFileList})=>{
                             )}
                         </FormControl>
 
-                        <FormControl fullWidth error={Boolean(touched.discount && errors.discount)} sx={{ ...theme.typography.customInput }}>
+                        <FormControl fullWidth error={Boolean(touched.discount && errors.discount)} style={{ marginBottom:"1em" }}>
                             <InputLabel htmlFor="outlined-adornment-email-login">discount</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email-login"
@@ -334,13 +332,12 @@ const FormProduct = ({product, fileList, setFileList})=>{
 
                         {values.discount>0 && 
                             <>
-                            <InputLabel htmlFor="outlined-adornment-email-login">Discount Expiration Date : </InputLabel>
-                            <FormControl fullWidth error={Boolean(touched.endDate && errors.endDate)} sx={{ ...theme.typography.customInput }}>
-                                
+                            <FormControl fullWidth error={Boolean(touched.endDate && errors.endDate)} style={{ marginBottom:"1em" }}>
                                 <TextField
                                     id="endDate"
                                     type="datetime-local"
                                     name="endDate"
+                                    label="Discount Expiration Date :"
                                     value={values.endDate}
                                     onBlur={handleBlur}
                                     onChange={handleChange}
@@ -354,46 +351,18 @@ const FormProduct = ({product, fileList, setFileList})=>{
                             </FormControl>
                             </>
                         }
-
-                        <FormControl fullWidth error={Boolean(touched.restaurant && errors.restaurant)} sx={{ ...theme.typography.customInput }}>
+                        <FormControl fullWidth error={Boolean(touched.category && errors.category)} style={{ marginBottom:"1em" }}>
+                            <InputLabel id="selectCat">Select catigory</InputLabel>
                             <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={values.restaurant}
-                                label="restaurant"
-                                name="restaurant"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={0} key={20} disabled>select restaurant</MenuItem>
-                                {data && data.restaurant && 
-                                    data.restaurant.map(res=>
-                                        <MenuItem value={res.id} key={res.id}>     
-                                            {res.title}
-                                        </MenuItem>
-                                    )
-                                }
-                                
-                            </Select>
-                            {touched.restaurant && errors.restaurant && (
-                                <FormHelperText error id="standard-weight-helper-text-email-login">
-                                    {errors.restaurant}
-                                </FormHelperText>
-                            )}
-                        </FormControl>
-
-                        <FormControl fullWidth error={Boolean(touched.category && errors.category)} sx={{ ...theme.typography.customInput }}>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
+                                labelId="selectCat"
+                                id="selectCat"
                                 value={values.category}
-                                label="category"
+                                label="Select catigory"
                                 name="category"
                                 multiple
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                             >
-                                <MenuItem default value={0} key={20} disabled>select catigory</MenuItem>
                                 {data && data.categories && 
                                     data.categories.map(cat=>
                                         <MenuItem value={cat.id} key={cat.id}>     
@@ -401,6 +370,9 @@ const FormProduct = ({product, fileList, setFileList})=>{
                                         </MenuItem>
                                     )
                                 }
+                                <MenuItem value={"hhhh"} key={0}>     
+                                            hhhh
+                                        </MenuItem>
                                 
                             </Select>
                             {touched.category && errors.category && (

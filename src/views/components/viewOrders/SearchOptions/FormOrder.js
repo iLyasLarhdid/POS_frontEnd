@@ -1,8 +1,15 @@
-import { Box, Button, Card, FormControl, InputLabel, MenuItem, Select, Stack } from "@mui/material";
+import { Box, Button, Card, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { useState } from "react";
 
 
 const FormOrder = ()=>{
-
+    const [category, setCategory] = useState();
+    const [search, setSearch] = useState();
+    const data = ["CAT1","CAT2","CAT3"];
+    const resetFields = ()=>{
+        setCategory(0);
+        setSearch("");
+    }
     return(
         <>
         <Card>
@@ -13,23 +20,35 @@ const FormOrder = ()=>{
                 noValidate
             >
                 <Stack spacing={2}>
-                    <div>restaurents: </div>
+                    <center><h3>Search Opetions</h3></center>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">restaurant</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
+                        <TextField
+                            variant="outlined" 
                             id="demo-simple-select"
-                            value={10}
-                            label="restaurant"
+                            value={search}
+                            label="Search"
+                            name="Search"
+                            onChange={(event)=>{setSearch(event.target.value)}}
+                        />
+                    </FormControl>
+                    <FormControl fullWidth>
+                        <InputLabel id="CategoriesID">Category</InputLabel>
+                        <Select
+                            labelId="CategoriesID"
+                            id="demo-simple-select"
+                            value={category}
+                            label="Category"
+                            name="category"
+                            onChange={(event)=>{setCategory(event.target.value)}}
                         >
                             <MenuItem value={0} key={0}>all</MenuItem>
-                            <MenuItem value={20} key={20}>mcdonalds</MenuItem>
-                            <MenuItem value={30} key={30}>pizza hut</MenuItem>
-                            <MenuItem value={40} key={40}>quick</MenuItem>
+                            {data.map(item=>{
+                                return (<MenuItem value={item} key={item}>{item}</MenuItem>)
+                            })}
                             
                         </Select>
                     </FormControl>
-                    <Button variant="outlined">Reset</Button>
+                    <Button variant="outlined" onClick={resetFields}>Reset</Button>
                 </Stack>
             </Box>
         </Card>

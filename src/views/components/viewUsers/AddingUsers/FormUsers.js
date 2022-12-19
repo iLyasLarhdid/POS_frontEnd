@@ -201,7 +201,8 @@ const FormUsers = ({setReload})=>{
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     password: Yup.string().max(255).required('password is required'),
                     city: Yup.string().max(255).required('city is required'),
-                    role: Yup.string().max(255).required('role is required'), address: Yup.string().max(255).required('address is required'),
+                    role: Yup.string().max(255).required('role is required'), 
+                    address: Yup.string().max(255).required('address is required'),
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {

@@ -13,7 +13,7 @@ const ProductsList = Loadable(lazy(()=>import ('./components/ProductsList')));
 
 const fetchData = async (key)=>{
     const options = key.queryKey[1];
-    const res = await fetch(`${config.host}/api/v1/products/page/${options.page-1}/options?restaurantId=${options.restaurants.id}&productName=${options.productName}&typeId=${options.type.id}`,{
+    const res = await fetch(`${config.host}/api/v1/products/page/${options.page-1}/options?productName=${options.productName}&typeId=${options.type.id}`,{
         headers: {
             'Content-Type' : 'application/json'
         }
@@ -22,7 +22,7 @@ const fetchData = async (key)=>{
 };
 
 const ProductPage = () => {
-    const defaultOptions = { page:1, restaurants:{id:'0',name:'all'}, productName:'', type:{id:'0',name:'all'} };
+    const defaultOptions = { page:1, productName:'', type:{id:'0',name:'all'} };
     const [options, setOptions] = useState({ ...defaultOptions });
 
     const {data} = useQuery(['homeProducts',options],fetchData);

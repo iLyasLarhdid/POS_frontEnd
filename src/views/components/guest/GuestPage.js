@@ -7,12 +7,12 @@ import Loadable from '../../../ui-component/Loadable';
 import { lazy, Suspense } from 'react';
 import config from 'config';
 import { useQuery } from 'react-query';
+import { Empty } from 'antd';
+//import backGroundImage from "./pic/back.jpg";
 
-import backGroundImage from "./pic/back.jpg";
-
-const JoinUsForm = Loadable(lazy(()=>import ('./components/JoinUsForm')));
+//const JoinUsForm = Loadable(lazy(()=>import ('./components/JoinUsForm')));
 const MainCard = Loadable(lazy(()=>import ('../../../ui-component/cards/MainCard')));
-const PageTop = Loadable(lazy(()=>import ('./PageTop')));
+//const PageTop = Loadable(lazy(()=>import ('./PageTop')));
 const ProductsList = Loadable(lazy(()=>import ('./components/ProductsList')));
 
 const fetchData = async (key)=>{
@@ -32,12 +32,12 @@ const GuestPage = () => {
     console.log("data for home----------------->",data);
     return (
         <>
-        <MainCard>
+        {/* <MainCard>
             <Suspense fallback={<div>loading..</div>}>
                 <PageTop />
             </Suspense>
-        </MainCard>
-        <MainCard title={<center><h3 style={{ margin:0 }}>Food</h3></center>} style={{ marginTop:25, marginBottom:25 }}>
+        </MainCard> */}
+        <MainCard title={<center><h3 style={{ margin:0 }}>Products</h3></center>} style={{ marginTop:25, marginBottom:25 }}>
             <Typography variant="body2">
                 <Box
                     sx={{
@@ -67,10 +67,22 @@ const GuestPage = () => {
 
                     <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
                 </Box>
-                    {data &&
+                    {data ?
                         <Suspense fallback={<div>loading..</div>}>
-                            <ProductsList products={data.bestDeals} typeOfData={"best_deals"}/>
+                            {
+                                data.bestDeals.content.length > 0 ?
+                                <ProductsList products={data.bestDeals} typeOfData={"best_deals"}/>
+                             :
+                                <Empty description={
+                                    <span>
+                                        No Discounts Available
+                                    </span>
+                                }/>
+                            }
+                            
                         </Suspense>
+                        :
+                        <Empty/>
                     }
                 <Box
                     sx={{
@@ -95,26 +107,37 @@ const GuestPage = () => {
                         disableRipple
                         disabled
                     >
-                        Most consumed
+                        Most Sold
                     </Button>
 
                     <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
                 </Box>
                 
-                    {data &&
+                    {data ?
                         <Suspense fallback={<div>loading..</div>}>
-                            <ProductsList products={data.mostConsumed} typeOfData={"best_deals"}/>
+                            {
+                                data.mostConsumed.content.length > 0 ?
+                                    <ProductsList products={data.mostConsumed} typeOfData={"best_deals"}/>
+                                 :
+                                    <Empty description={
+                                        <span>
+                                        No Products Available
+                                        </span>
+                                    }/>
+                            }
                         </Suspense>
+                        :
+                        <Empty/>
                     }
                 
             </Typography>
         </MainCard>
-
+{/* 
         <MainCard title={<center><h3 style={{ margin:0 }}>Join us</h3></center>} style={{ backgroundImage:`url(${backGroundImage})`,backgroundSize:'cover', backgroundRepeat:'no-repeat', backgroundPosition:'center' }}>
             <Suspense fallback={<div>loading..</div>}>
                 <JoinUsForm/>
             </Suspense>
-        </MainCard>
+        </MainCard> */}
         </>
     );
 };

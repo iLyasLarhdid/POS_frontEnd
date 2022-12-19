@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Stack } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, OutlinedInput, Stack } from "@mui/material";
 import config from 'config';
 import { useQuery } from "react-query";
 
@@ -33,7 +33,7 @@ const ProductsOptions =({options,setOptions,defaultOptions})=>{
                             inputProps={{}}
                         />
                     </FormControl>
-                    <FormControl fullWidth>
+                    {/* <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">restaurant</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -48,7 +48,7 @@ const ProductsOptions =({options,setOptions,defaultOptions})=>{
                             }
                             
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <Button variant="outlined" onClick={()=>setOptions(defaultOptions)}>Reset</Button>
                 </>}
             </Stack>

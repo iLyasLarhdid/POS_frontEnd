@@ -49,7 +49,7 @@ const AddProducts = () => {
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    {(cookies.principal_role === "SUPER_ADMIN" || cookies.principal_role === "RESTAURANTS") && <>
+                    {(cookies.principal_role === "SUPER_ADMIN" || cookies.principal_role === "ADMIN") && <>
                     <Grid item lg={3} md={6} sm={6} xs={12}>
                         <ProductPictureUpload product={data} fileList={fileList} setFileList={setFileList}/>
                     </Grid>

@@ -32,7 +32,7 @@ const AuthLogin = Loadable(lazy(() => import('./views/components/authentication/
 const AuthRegister = Loadable(lazy(() => import('./views/components/authentication/authentication3/Register3')));
 
 const AddProduct = Loadable(lazy(() => import('./views/components/addingProduct')));
-const ViewRestaurants = Loadable(lazy(() => import('./views/components/viewRestaurants')));
+//const ViewRestaurants = Loadable(lazy(() => import('./views/components/viewRestaurants')));
 
 const ViewUsers = Loadable(lazy(() => import('views/components/viewUsers')));
 
@@ -93,9 +93,9 @@ function App() {
                     <Route exact path="/addProduct/:id" >
                         {cookies.smailToken || customization.isLoggedIn ? <MainLayout page={<AddProduct/>} /> : <PageNotFound />}
                     </Route>
-                    <Route exact path="/viewRestaurants" >
+                    {/* <Route exact path="/viewRestaurants" >
                         {cookies.smailToken || customization.isLoggedIn ? <MainLayout page={<ViewRestaurants/>} /> : <PageNotFound />}
-                    </Route>
+                    </Route> */}
                     <Route exact path="/viewUsers" >
                         {cookies.smailToken || customization.isLoggedIn ? <MainLayout page={<ViewUsers/>} /> : <PageNotFound />}
                     </Route>
