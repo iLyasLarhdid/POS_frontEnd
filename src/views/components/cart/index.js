@@ -1,5 +1,5 @@
 import { Button, Checkbox, CircularProgress, FormControlLabel, Grid, Input, MenuItem, Select } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { gridSpacing } from "store/constant";
 import MainCard from "ui-component/cards/MainCard";
@@ -7,6 +7,11 @@ import CartItem from "./CartItem";
 import config from 'config';
 import { useQuery } from "react-query";
 import { useSnackbar } from "notistack";
+
+///////////////////////////////// FOR SPEECH ////////////////////////////////
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import {metaphone} from 'metaphone'
+/////////////////////////////////////////////////////////////////////////////
 
 const fetchData = async (key)=>{
     const res = await fetch(`${config.host}/api/v1/cities`,{
@@ -16,7 +21,14 @@ const fetchData = async (key)=>{
     } )
     return res.json();
 }
-
+const fetchProducts = async (key)=>{
+    const res = await fetch(`${config.host}/api/v1/products`,{
+        headers: {
+            'Content-Type' : 'application/json'
+        }
+    } )
+    return res.json();
+};
 
 //here you need to use useSuery to get the product from database then pass it to the cartItem for display
 const Cart = ()=>{
@@ -26,7 +38,49 @@ const Cart = ()=>{
     const [address, setAddress] = useState("");
     const [city, setCity] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
+    //////////////////// FOR VOICE ///////////////////////////////
+    //todo  :
+    /* (you should add voice so your app can speak, also commands that can be excuted like confirm and abort "do you confirm the order : {expecting yes/no/product}")
+    -get the product names from the backend turn them into phonetics
+    -when the user says 'order' start filling the tarnscript
+    -loop through names looking for the product names that the user mentioned 
+    (product name can be multiple words we get the phonetic of thos words saperatly and we search only by the first word, if we found then we continue search for other upcoming words untill we find the product, if we found multiple products with the name we present them and let the user choose by 'number_of_product')
+    -if nothing was found ask again 'application will speak and ask the user to repeat'
+    */
+    const [names, setNames] = useState([]);
+    const [myTextPhon, setMyTextPhon] = useState([]); //phonetic representation of the text captured from the user
+    const [myProdPhon, setMyProdPhon] = useState([]); //phonetic representation of the products names
 
+    console.log("namesssssssssssssss",names, "text phon : ",myTextPhon );
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+      } = useSpeechRecognition();
+    
+    // get products names
+    const {data : products} = useQuery(['products'],fetchProducts);
+
+    console.log("products -------------",products);
+    useEffect(()=>{
+        // set a timer when the user stops talking for 10 seconds it means he finished talking
+        // if no word was recognized ask him again and delete the previous text in transcript = ""
+        if(transcript){
+            setMyTextPhon(transcript.split(" ").map(item=>metaphone(item)));
+        }
+    },[transcript]);
+    useEffect(()=>{
+        if(products){
+            setNames(products.map(item=>metaphone(item)));
+        }
+    },[products])
+
+    useEffect(()=>{
+        myTextPhon.map(item=>console.log(item," in my list === ",names.includes(item)))
+    },[transcript,myTextPhon, names]);
+    /////////////////////////////////////////////////////////////
+    
     const {data} = useQuery(['cities'],fetchData)
 
     console.log("cities ",data);
@@ -84,7 +138,16 @@ const Cart = ()=>{
     return(
 <MainCard>
     <Grid container spacing={gridSpacing}>
-        
+        {browserSupportsSpeechRecognition && 
+        <div>
+            <p>Microphone: {listening ? 'on' : 'off'}</p>
+            <button onClick={()=>SpeechRecognition.startListening({continuous:true})}>Start</button>
+            <button onClick={SpeechRecognition.stopListening}>Stop</button>
+            <button onClick={resetTranscript}>Reset</button>
+            <p>{transcript}</p>
+            <p>{myTextPhon && myTextPhon.map(item=><span>{item} </span>)}</p>
+        </div>
+        }
         {cookies.cart && cookies.cart.map((product)=>{
             console.log('prod : :::: : ',product);
             return(

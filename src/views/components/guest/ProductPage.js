@@ -38,7 +38,7 @@ const ProductPage = () => {
         <Grid container spacing={5}>
             <Grid container item spacing={3}>
                 <Grid item xs={12} md={3}>
-                    <MainCard title={<h3 style={{ margin:0 }}>Options</h3>}>
+                    <MainCard title={<h3 style={{ margin:0 }}>Options</h3>}>                        
                         <ProductsOptions options={options} setOptions={setOptions} defaultOptions={defaultOptions}/>
                     </MainCard>
                 </Grid>

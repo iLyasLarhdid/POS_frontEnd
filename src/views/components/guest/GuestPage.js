@@ -129,7 +129,6 @@ const GuestPage = () => {
                         :
                         <Empty/>
                     }
-                
             </Typography>
         </MainCard>
 {/* 

@@ -1,7 +1,8 @@
 // material-ui
 import { Typography, Grid, Button } from '@mui/material';
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 import MainCard from '../../../ui-component/cards/MainCard';
 import Loadable from '../../../ui-component/Loadable';
@@ -23,8 +24,14 @@ const ProductCard = Loadable(lazy(()=>import('./components/ProductReviewCard')))
 
 const ProductReviewPage = () => {
     const {id} = useParams();
-
+    const history = useHistory();
     const {data} = useQuery(['homeProducts',id],fetchData);
+
+    useEffect(()=>{
+        if(data && data.status !== undefined){
+            history.goBack();
+        }
+    },[data,history]);
 
     return (
         <>
@@ -32,7 +39,7 @@ const ProductReviewPage = () => {
             <Grid container item spacing={3}>
                 <Grid item xs={12} md={7}>
                     <MainCard>
-                        {data && <ProductCard product={data} key={data.id}/>}
+                        {data && data.status===undefined && <ProductCard product={data} key={data.id}/>}
                     </MainCard>
                 </Grid>
                 
