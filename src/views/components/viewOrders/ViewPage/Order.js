@@ -89,7 +89,7 @@ const Order = ({id})=>{
     <div className="row">
     <Card>
     <Box 
-        sx={{ mt: 2}} 
+        sx={{ mt: 2}}
         style={{ borderRadius:"10px", padding:"1rem",marginBottom:"1rem"}}
         autoComplete="off"
         noValidate
