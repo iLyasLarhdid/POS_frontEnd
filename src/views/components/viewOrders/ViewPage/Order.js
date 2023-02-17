@@ -2,10 +2,12 @@ import React from 'react';
 import { useCookies } from "react-cookie";
 import { useQuery } from "react-query";
 import config from "config";
-import { Avatar, Card, Paper, styled, Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Avatar, Button, Card, Paper, styled, Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import { Box } from '@mui/system';
+import { useSnackbar } from 'notistack';
+import { useHistory } from 'react-router-dom';
 
 
 const fetchData = async (key)=>{
@@ -45,9 +47,42 @@ const Order = ({id})=>{
 
     //get the id from index page and retrieve data based on it
     const [cookie] = useCookies([]);
+    const history = useHistory();
     const {data} = useQuery(['posts',cookie.smailToken,id],fetchData);
+    const { enqueueSnackbar } = useSnackbar();
 
     console.log(data);
+
+    //this is to change the state of our order into accepted
+    const delever = () => {
+        const url = `${config.host}/api/v1/orders`;
+        // setIsButtonLoading(true);
+        fetch(url, {
+            method: 'put',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': cookie.smailToken
+            },
+            body: JSON.stringify({ id, orderState:1 })
+            })
+            .then((response) => {
+                console.log(response);
+                if (!response.ok) throw Error('Something went wrong');
+                else {
+                    console.log('hello we just updated your order state');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("data",data);
+                enqueueSnackbar('the order has been delevered!', {variant: 'success',});
+                history.push("/viewOrders");
+            })
+            .catch((err) => {
+                console.error(err.message);
+                enqueueSnackbar('something went wrong !', {variant: 'error',});
+            });
+    };
 
     return(
     <div className="container">
@@ -97,7 +132,7 @@ const Order = ({id})=>{
                 </Table>
             </TableContainer>
             <h2 style={{display: 'flex',alignItems: 'center' }}><PointOfSaleIcon/> total : { data && data.products.map(row =>row.price * row.quantity).reduce((oldVal,newVal)=>oldVal+newVal) }</h2>
-
+            <Button onClick={delever} >Delivered</Button>
         </Box>
     </Card>
         

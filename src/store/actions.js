@@ -7,5 +7,6 @@ export const SET_BORDER_RADIUS = '@customization/SET_BORDER_RADIUS';
 export const LOGGING = '@customization/LOGGING';
 export const LOGOUT = '@customization/LOGOUT';
 export const ADD_TO_CART = '@customization/ADD_TO_CART';
+export const RESET_CART = '@customization/RESET_CART';
 export const UPDATE_CART = '@customization/UPDATE_CART';
 export const REMOVE_FROM_CART = '@customization/REMOVE_FROM_CART';

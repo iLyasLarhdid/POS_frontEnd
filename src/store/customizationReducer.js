@@ -46,6 +46,12 @@ const customizationReducer = (state = initialState, action) => {
                 ...state,
                 cart: newCart
             };
+        case actionTypes.RESET_CART:
+            newCart = action.cart;
+            return {
+                ...state,
+                cart: newCart
+            };
         case actionTypes.LOGGING:
             return {
                 ...state,

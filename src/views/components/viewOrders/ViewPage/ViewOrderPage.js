@@ -90,7 +90,13 @@ const ViewOrderPage = ()=>{
                                 }
                                 placement="top-end"
                             >
-                                <Button style={{ marginTop:10 }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button>
+                                {order.orderState==="WAITING"
+                                ?
+                                    <Button style={{ marginTop:10, backgroundColor:"blue" }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button>
+                                :
+                                    <Button style={{ marginTop:10, backgroundColor:"green" }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button>}
+
+                                {/* <Button style={{ marginTop:10 }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button> */}
                             </HtmlTooltip>
                             
                         </div>
