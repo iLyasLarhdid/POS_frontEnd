@@ -30,7 +30,7 @@ const UsersCard = ({user})=>{
             <CardMedia
                 component="img"
                 height="200"
-                image={user.avatar ? `${config.host}/upload/viewFile/${user.avatar}` : "https://qph.fs.quoracdn.net/main-thumb-1176523004-200-taekpmmjavcgnijhmdujoqarphkecbdv.jpeg"}
+                image={user.avatar ? `${config.host}/upload/viewFile/${user.avatar}` : "https://www.pngitem.com/pimgs/m/52-526807_responsible-person-icon-hd-png-download.png"}
                 alt="green iguana"
                 />
                 <CardContent>

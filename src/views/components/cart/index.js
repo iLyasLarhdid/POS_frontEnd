@@ -45,7 +45,7 @@ const Cart = ()=>{
 
     const {data} = useQuery(['cities'],fetchData)
 
-    console.log("cities ",data);
+    //console.log("cities ",data);
 
     const order = (values) => {
         console.log("the values are ",values);
@@ -111,6 +111,7 @@ const Cart = ()=>{
     const dispatch = useDispatch();
     const customization = useSelector((state) => state.customization);
 
+    console.log("customization",customization.cart);
     const [names, setNames] = useState([]);
     const [myTextPhon, setMyTextPhon] = useState([]); //phonetic representation of the text captured from the user
     const [myProdPhon, setMyProdPhon] = useState([]); //phonetic representation of the products names
@@ -123,7 +124,7 @@ const Cart = ()=>{
     useEffect(()=>{
         SpeechRecognition.startListening({continuous:true})
     },[]);
-    console.log("namesssssssssssssss",names, "text phon : ",myTextPhon );
+    //console.log("namesssssssssssssss",names, "text phon : ",myTextPhon );
     
     const {
         transcript,
@@ -148,31 +149,37 @@ const Cart = ()=>{
             setNames(products.map(item=>metaphone(item.name)));
         }
     },[products])
-
+    
     const addToCart = (product, quantity=1) => {
         // useCookies works similare to redux it shanges on every time we change the cookies so maybe if i didn't find a good reason to keep the cart in redux ill just use cookies
-        console.log("adddddd toooo cart ",product);
         if(product!==undefined){
             if(cookies.cart !== undefined && cookies.cart !== [] ){
-                const unrepeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]!==product.id);
-                const repeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]===product.id);
-    
+                //const unrepeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]!==product.id);
+                //const repeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]===product.id);
+                const unrepeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]!==product.id);
+                const repeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]===product.id);
+                
                 let newQuantity = quantity;
                 if(repeatedProduct.length > 0){
                     newQuantity = repeatedProduct[0][2]+quantity;
                 }
                 if(newQuantity>0){
                     setCookies('cart', [...unrepeatedProduct, [product.id,product.name,newQuantity]], { path: '/', maxAge: 86400 });
-                    dispatch({ type: ADD_TO_CART , cart: [...cookies.cart, [product.id,product.name,newQuantity]] });
+                    dispatch({ type: ADD_TO_CART , cart: [...unrepeatedProduct, [product.id,product.name,newQuantity]] });
+                    console.log("add toooo cart 1 ",product , " unrepeated : ",unrepeatedProduct);
                 }
                 else{
                     setCookies('cart', [...unrepeatedProduct], { path: '/', maxAge: 86400 });
-                    dispatch({ type: ADD_TO_CART , cart: [ ...cookies.cart ] });
+                    dispatch({ type: ADD_TO_CART , cart: [ ...unrepeatedProduct ] });
+                    console.log("add toooo cart 2",product);
                 }
+                console.log("hello ;;;;",customization.cart.length);
             }
             else {
                 setCookies('cart', [[product.id,product.name,quantity]], { path: '/', maxAge: 86400 });
-                dispatch({ type: ADD_TO_CART , cart: [[product.id,product.name,quantity]] });}
+                dispatch({ type: ADD_TO_CART , cart: [[product.id,product.name,quantity]] });
+                console.log("add toooo cart 3",product);
+            }
         }
     };
 
@@ -183,30 +190,77 @@ const Cart = ()=>{
     
     useEffect(()=>{
         const tt = transcript.split(" ");
+        const numbers = {"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15};
+        let quantities=[]
+        let orderedProds = [];
         if(myTextPhon[myTextPhon.length-1]===metaphone("please")){
             if(tt.includes("remove")){
-                myTextPhon.map(item=>{
-                    if(names.includes(item)){
-                        console.log("index of ",names.indexOf(item));
-                        console.log("prod :::::::",products[names.indexOf(item)]);
-                        addToCart(products[names.indexOf(item)],-1);
-                        resetTranscript();
-                        setMyTextPhon("");
+                tt.map(item=>{
+                    if(typeof item === "string" && !isNaN(item)){
+                        quantities[quantities.length]= parseInt(item);
                     }
-                    return 0;}
-                )
+                    else if(numbers[item]!==undefined){
+                        quantities[quantities.length]= numbers[item];
+                        //addToCart(products[names.indexOf(item)],-1);
+                        //resetTranscript();
+                        //setMyTextPhon("");
+                    }
+                    return 0;
+                });
+                myTextPhon.map(item=>{ 
+                    if(names.includes(item)){
+                        //console.log("index of ",names.indexOf(item));
+                        //console.log("prod :::::::",products[names.indexOf(item)]);
+                        orderedProds[orderedProds.length] = products[names.indexOf(item)];
+                        //addToCart(products[names.indexOf(item)],-1);
+                        //resetTranscript();
+                        //setMyTextPhon("");
+                    }
+                    return 0;
+                });
+                console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
+                orderedProds.map(item=>{
+                    const n = quantities[orderedProds.indexOf(item)] 
+                    addToCart(item,-n);
+                    return 0;
+                })
+                // addToCart(products[names.indexOf(item)],-1);
+                resetTranscript();
+                setMyTextPhon("");
             }
             else{
-                myTextPhon.map(item=>{
-                    if(names.includes(item)){
-                        console.log("index of ",names.indexOf(item));
-                        console.log("prod :::::::",products[names.indexOf(item)]);
-                        addToCart(products[names.indexOf(item)],1);
-                        resetTranscript();
-                        setMyTextPhon("");
+                tt.map(item=>{
+                    if(typeof item === "string" && !isNaN(item)){
+                        quantities[quantities.length]= parseInt(item);
                     }
-                    return 0;}
-                )
+                    else if(numbers[item]!==undefined){
+                        quantities[quantities.length]= numbers[item];
+                        //addToCart(products[names.indexOf(item)],-1);
+                        //resetTranscript();
+                        //setMyTextPhon("");
+                    }
+                    return 0;
+                });
+                myTextPhon.map(item=>{ 
+                    if(names.includes(item)){
+                        //console.log("index of ",names.indexOf(item));
+                        //console.log("prod :::::::",products[names.indexOf(item)]);
+                        orderedProds[orderedProds.length] = products[names.indexOf(item)];
+                        //addToCart(products[names.indexOf(item)],-1);
+                        //resetTranscript();
+                        //setMyTextPhon("");
+                    }
+                    return 0;
+                });
+                orderedProds.map(item=>{
+                    console.log("item ",item);
+                    const n = quantities[orderedProds.indexOf(item)]
+                    addToCart(item,n);
+                    return 0;
+                })
+                console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
+                resetTranscript();
+                setMyTextPhon("");
             }
         }
         if(tt[tt.length-1]==="reset"){
@@ -231,6 +285,8 @@ const Cart = ()=>{
     return(
 <MainCard>
     <Grid container spacing={gridSpacing}>
+        {
+            <p>{transcript}</p>}
         {/* {browserSupportsSpeechRecognition && 
         <div>
             <p>Microphone: {listening ? 'on' : 'off'}</p>

@@ -21,7 +21,7 @@ const CartItem = ({ item }) => {
     const dispatch = useDispatch();
 
     const {data} = useQuery(['product',item.id],fetchData)
-    console.log("data for cart----------------->",data);
+    //console.log("data for cart----------------->",data);
 
     const [cookies, setCookies] = useCookies();
 

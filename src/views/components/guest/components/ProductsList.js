@@ -6,16 +6,19 @@ import ProductCard from '../components/ProductCard';
 
 const ProductsList = ({products, typeOfData, options}) => {
 
-    const [startsEnds, setStartsEnds] = useState([0,3]);
+    const [startsEnds, setStartsEnds] = useState([0,9]);
     const [showMore, setShowMore] = useState(false);
+    console.log("products : ",products);
     useEffect(()=>{
-        if(showMore){
-            setStartsEnds([0,9]);
+        if(typeOfData !== "products_page"){
+            if(showMore){
+                setStartsEnds([0,9]);
+            }
+            if(!showMore){
+                setStartsEnds([0,3]);
+            }
         }
-        if(!showMore){
-            setStartsEnds([0,3]);
-        }
-    },[showMore]);
+    },[showMore,typeOfData]);
     console.log(products);
     return(
         <>

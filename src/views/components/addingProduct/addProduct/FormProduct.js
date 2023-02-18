@@ -370,10 +370,6 @@ const FormProduct = ({product, fileList, setFileList})=>{
                                         </MenuItem>
                                     )
                                 }
-                                <MenuItem value={"hhhh"} key={0}>     
-                                            hhhh
-                                        </MenuItem>
-                                
                             </Select>
                             {touched.category && errors.category && (
                                 <FormHelperText error id="standard-weight-helper-text-email-login">
