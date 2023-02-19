@@ -150,39 +150,97 @@ const Cart = ()=>{
         }
     },[products])
     
-    const addToCart = (product, quantity=1) => {
+    const addToCart = (products, quantity) => {
         // useCookies works similare to redux it shanges on every time we change the cookies so maybe if i didn't find a good reason to keep the cart in redux ill just use cookies
-        if(product!==undefined){
+        if(products!==undefined){    
+            if(quantity === undefined){
+                quantity = products.map(item=>1);
+            }
             if(cookies.cart !== undefined && cookies.cart !== [] ){
                 //const unrepeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]!==product.id);
                 //const repeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]===product.id);
-                const unrepeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]!==product.id);
-                const repeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]===product.id);
+                const unrepeatedProduct = cookies.cart.filter(oldProduct=>{
+                    if(oldProduct===undefined || oldProduct === null){
+                        return true;
+                    }
+                    return !products.map(item=>item.id).includes(oldProduct[0])
+                });
+                //const repeatedProduct = cookies.cart.filter(oldProduct=>products.map(item=>item.id).includes(oldProduct[0]));
+                const repeatedProduct = cookies.cart.filter(oldProduct=>{
+                    if(oldProduct===undefined || oldProduct === null){
+                        return false;
+                    }
+                    return products.map(item=>item.id).includes(oldProduct[0]);
+                    
+                });
                 
-                let newQuantity = quantity;
-                if(repeatedProduct.length > 0){
-                    newQuantity = repeatedProduct[0][2]+quantity;
-                }
-                if(newQuantity>0){
-                    setCookies('cart', [...unrepeatedProduct, [product.id,product.name,newQuantity]], { path: '/', maxAge: 86400 });
-                    dispatch({ type: ADD_TO_CART , cart: [...unrepeatedProduct, [product.id,product.name,newQuantity]] });
-                    console.log("add toooo cart 1 ",product , " unrepeated : ",unrepeatedProduct);
-                }
-                else{
-                    setCookies('cart', [...unrepeatedProduct], { path: '/', maxAge: 86400 });
-                    dispatch({ type: ADD_TO_CART , cart: [ ...unrepeatedProduct ] });
-                    console.log("add toooo cart 2",product);
-                }
-                console.log("hello ;;;;",customization.cart.length);
+                const addedToCart = products.filter((item,key)=>{
+                    let newQuantity = quantity[key] !== undefined ? quantity[key] : 1;
+                    if(repeatedProduct.length > 0){
+                        newQuantity = repeatedProduct[0][2]+newQuantity;
+                    }
+                    if(newQuantity<=0){
+                        return false;
+                    }
+                    return true;
+                }).map((item,key)=>{
+                    let newQuantity = quantity[key] !== undefined ? quantity[key] : 1;
+                    if(repeatedProduct.length > 0){
+                        newQuantity = repeatedProduct[0][2]+newQuantity;
+                    }
+                    if(newQuantity>0){
+                        return [item.id,item.name,newQuantity];
+                    }
+                });
+                setCookies('cart', [...unrepeatedProduct, ...addedToCart], { path: '/', maxAge: 86400 });
+                dispatch({ type: ADD_TO_CART , cart: [...unrepeatedProduct, ...addedToCart] });
+                console.log("add toooo cart 1 ",products , " unrepeated : ",unrepeatedProduct);
+                //////////////////npm i pluralize/////////////////////////
             }
             else {
-                setCookies('cart', [[product.id,product.name,quantity]], { path: '/', maxAge: 86400 });
-                dispatch({ type: ADD_TO_CART , cart: [[product.id,product.name,quantity]] });
-                console.log("add toooo cart 3",product);
+                const addedToCart = products.map((item,key)=>{
+                    let newQuantity = quantity[key] !== undefined ? quantity[key] : 1;
+                    return [item.id,item.name,newQuantity];
+                });
+                setCookies('cart', addedToCart, { path: '/', maxAge: 86400 });
+                dispatch({ type: ADD_TO_CART , cart: addedToCart });
+                console.log("add toooo cart 3",products);
             }
         }
     };
-
+    // const addToCart = (product, quantity=1) => {
+    //     // useCookies works similare to redux it shanges on every time we change the cookies so maybe if i didn't find a good reason to keep the cart in redux ill just use cookies
+    //     if(product!==undefined){
+    //         if(cookies.cart !== undefined && cookies.cart !== [] ){
+    //             //const unrepeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]!==product.id);
+    //             //const repeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]===product.id);
+    //             const unrepeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]!==product.id);
+    //             const repeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]===product.id);
+                
+    //             let newQuantity = quantity;
+    //             if(repeatedProduct.length > 0){
+    //                 newQuantity = repeatedProduct[0][2]+quantity;
+    //             }
+    //             if(newQuantity>0){
+    //                 setCookies('cart', [...unrepeatedProduct, [product.id,product.name,newQuantity]], { path: '/', maxAge: 86400 });
+    //                 dispatch({ type: ADD_TO_CART , cart: [...unrepeatedProduct, [product.id,product.name,newQuantity]] });
+    //                 console.log("add toooo cart 1 ",product , " unrepeated : ",unrepeatedProduct);
+    //                 //////////////////npm i pluralize/////////////////////////
+    //             }
+    //             else{
+    //                 setCookies('cart', [...unrepeatedProduct], { path: '/', maxAge: 86400 });
+    //                 dispatch({ type: ADD_TO_CART , cart: [ ...unrepeatedProduct ] });
+    //                 console.log("add toooo cart 2",product);
+    //             }
+    //             console.log("hello ;;;;",customization.cart.length);
+    //         }
+    //         else {
+    //             setCookies('cart', [[product.id,product.name,quantity]], { path: '/', maxAge: 86400 });
+    //             dispatch({ type: ADD_TO_CART , cart: [[product.id,product.name,quantity]] });
+    //             console.log("add toooo cart 3",product);
+    //         }
+    //     }
+    // };
     const resetCart=()=>{
         setCookies('cart', [], { path: '/', maxAge: 1 });
         dispatch({ type: RESET_CART , cart: [] });
@@ -197,10 +255,10 @@ const Cart = ()=>{
             if(tt.includes("remove")){
                 tt.map(item=>{
                     if(typeof item === "string" && !isNaN(item)){
-                        quantities[quantities.length]= parseInt(item);
+                        quantities[quantities.length]= -parseInt(item);
                     }
                     else if(numbers[item]!==undefined){
-                        quantities[quantities.length]= numbers[item];
+                        quantities[quantities.length]= -numbers[item];
                         //addToCart(products[names.indexOf(item)],-1);
                         //resetTranscript();
                         //setMyTextPhon("");
@@ -219,14 +277,14 @@ const Cart = ()=>{
                     return 0;
                 });
                 console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
-                orderedProds.map(item=>{
-                    const n = quantities[orderedProds.indexOf(item)] 
-                    addToCart(item,-n);
-                    return 0;
-                })
+                // orderedProds.map(item=>{
+                //     const n = quantities[orderedProds.indexOf(item)] 
+                //     addToCart(item,-n);
+                //     return 0;
+                // })
                 // addToCart(products[names.indexOf(item)],-1);
-                resetTranscript();
-                setMyTextPhon("");
+                // resetTranscript();
+                // setMyTextPhon("");
             }
             else{
                 tt.map(item=>{
@@ -252,16 +310,17 @@ const Cart = ()=>{
                     }
                     return 0;
                 });
-                orderedProds.map(item=>{
-                    console.log("item ",item);
-                    const n = quantities[orderedProds.indexOf(item)]
-                    addToCart(item,n);
-                    return 0;
-                })
-                console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
-                resetTranscript();
-                setMyTextPhon("");
+                // orderedProds.map(item=>{
+                //     console.log("item ",item);
+                //     const n = quantities[orderedProds.indexOf(item)]
+                //     addToCart(item,n);
+                //     return 0;
+                // })
             }
+            addToCart(orderedProds,quantities);
+            console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
+            resetTranscript();
+            setMyTextPhon("");
         }
         if(tt[tt.length-1]==="reset"){
             resetCart();
@@ -285,8 +344,8 @@ const Cart = ()=>{
     return(
 <MainCard>
     <Grid container spacing={gridSpacing}>
-        {
-            <p>{transcript}</p>}
+    
+
         {/* {browserSupportsSpeechRecognition && 
         <div>
             <p>Microphone: {listening ? 'on' : 'off'}</p>
@@ -298,11 +357,14 @@ const Cart = ()=>{
         </div>
         } */}
         {cookies.cart && cookies.cart.map((product)=>{
-            return(
-                <Grid item lg={4} md={6} sm={6} xs={12}>
-                    <CartItem item={{id:product[0],name:product[1],quantity:product[2]}} />
-                </Grid>
-            );
+            if(product!==null){
+                return(
+                    <Grid item lg={4} md={6} sm={6} xs={12}>
+                        <CartItem item={{id:product[0],name:product[1],quantity:product[2]}} />
+                    </Grid>
+                );
+            }
+            return "";
         })}
         
         <Grid item xs={12} md={12}>
