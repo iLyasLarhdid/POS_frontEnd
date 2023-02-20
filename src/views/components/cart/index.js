@@ -262,6 +262,8 @@ const Cart = ()=>{
                         //addToCart(products[names.indexOf(item)],-1);
                         //resetTranscript();
                         //setMyTextPhon("");
+                    }else{
+                        quantities[quantities.length]= -1;
                     }
                     return 0;
                 });
