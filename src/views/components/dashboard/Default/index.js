@@ -13,14 +13,27 @@ import TotalGrowthBarChart from './TotalGrowthBarChart';
 import { gridSpacing } from '../../../../store/constant';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import config from 'config';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
+const fetchData = async (key)=>{
+    const token = key.queryKey[1];
+    const res = await fetch(`${config.host}/api/v1/orders/stats`,{
+        headers: {
+            'Content-Type' : 'application/json',
+            'Authorization': token
+        }
+    } )
+    return res.json();
+};
 
 const Dashboard = () => {
     const [isLoading, setLoading] = useState(true);
     const [cookies] = useCookies();
     const history = useHistory();
-
+    const {data} = useQuery(['stats',cookies.smailToken],fetchData)
+    console.log("dataa for update----------------->",data);
     useEffect(() => {
         if (cookies.smailToken === undefined) {
             console.warn('youre not logged in!');
@@ -33,37 +46,19 @@ const Dashboard = () => {
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <div>hello 1</div>
-                        <EarningCard isLoading={isLoading} />
+                    <Grid item lg={6} xs={12}>
+                        <EarningCard isLoading={isLoading} data={data}/>
                     </Grid>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <div>hello 2</div>
-                        <TotalOrderLineChartCard isLoading={isLoading} />
+                    <Grid item lg={6} xs={12}>
+                        <TotalOrderLineChartCard isLoading={isLoading} data ={data} />
                     </Grid>
-                    <Grid item lg={4} md={12} sm={12} xs={12}>
-                        <Grid container spacing={gridSpacing}>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <div>hello 3</div>
-                                <TotalIncomeDarkCard isLoading={isLoading} />
-                            </Grid>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <div>hello 4</div>
-                                <TotalIncomeLightCard isLoading={isLoading} />
-                            </Grid>
-                        </Grid>
-                    </Grid>
+                    
                 </Grid>
             </Grid>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Grid item xs={12} md={8}>
-                        <div>hello 5</div>
-                        <TotalGrowthBarChart isLoading={isLoading} />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <div>hello 6</div>
-                        <PopularCard isLoading={isLoading} />
+                    <Grid item xs={12}>
+                        <TotalGrowthBarChart isLoading={isLoading} data={data} />
                     </Grid>
                 </Grid>
             </Grid>

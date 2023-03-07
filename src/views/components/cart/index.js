@@ -247,7 +247,7 @@ const Cart = ()=>{
     }
     
     useEffect(()=>{
-        const tt = transcript.split(" ");
+        const tt = transcript.toLowerCase().split(" ");
         const numbers = {"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15};
         let quantities=[]
         let orderedProds = [];
@@ -257,12 +257,13 @@ const Cart = ()=>{
                     if(typeof item === "string" && !isNaN(item)){
                         quantities[quantities.length]= -parseInt(item);
                     }
-                    else if(numbers[item]!==undefined){
+                    else if(numbers[item]!==undefined ){
                         quantities[quantities.length]= -numbers[item];
+                        console.log("hello im in ",numbers[item],"--",item);
                         //addToCart(products[names.indexOf(item)],-1);
                         //resetTranscript();
                         //setMyTextPhon("");
-                    }else{
+                    }else if(names.includes(item)){
                         quantities[quantities.length]= -1;
                     }
                     return 0;
@@ -346,8 +347,7 @@ const Cart = ()=>{
     return(
 <MainCard>
     <Grid container spacing={gridSpacing}>
-    
-
+    {/* <p>{transcript}</p> */}
         {/* {browserSupportsSpeechRecognition && 
         <div>
             <p>Microphone: {listening ? 'on' : 'off'}</p>
