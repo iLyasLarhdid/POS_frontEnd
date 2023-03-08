@@ -28,6 +28,7 @@
     "metaphone": "^2.0.1",
     "node-sass": "^6.0.1",
     "notistack": "^2.0.3",
+    "pluralize": "^8.0.0",
     "prop-types": "15.7.2",
     "react": "17.0.2",
     "react-apexcharts": "^1.3.9",

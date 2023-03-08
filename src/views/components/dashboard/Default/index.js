@@ -5,10 +5,7 @@ import { Grid } from '@mui/material';
 
 // project imports
 import EarningCard from './EarningCard';
-import PopularCard from './PopularCard';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
-import TotalIncomeDarkCard from './TotalIncomeDarkCard';
-import TotalIncomeLightCard from './TotalIncomeLightCard';
 import TotalGrowthBarChart from './TotalGrowthBarChart';
 import { gridSpacing } from '../../../../store/constant';
 import { useCookies } from 'react-cookie';
@@ -33,7 +30,6 @@ const Dashboard = () => {
     const [cookies] = useCookies();
     const history = useHistory();
     const {data} = useQuery(['stats',cookies.smailToken],fetchData)
-    console.log("dataa for update----------------->",data);
     useEffect(() => {
         if (cookies.smailToken === undefined) {
             console.warn('youre not logged in!');

@@ -13,6 +13,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import {metaphone} from 'metaphone'
 import { useDispatch, useSelector } from "react-redux";
 import { ADD_TO_CART, RESET_CART } from "store/actions";
+import pluralize from "pluralize";
 /////////////////////////////////////////////////////////////////////////////
 
 const fetchData = async (key)=>{
@@ -114,7 +115,7 @@ const Cart = ()=>{
     console.log("customization",customization.cart);
     const [names, setNames] = useState([]);
     const [myTextPhon, setMyTextPhon] = useState([]); //phonetic representation of the text captured from the user
-    const [myProdPhon, setMyProdPhon] = useState([]); //phonetic representation of the products names
+    
 
     useEffect(() => {
         msg.text = speech;
@@ -132,26 +133,32 @@ const Cart = ()=>{
         resetTranscript,
         browserSupportsSpeechRecognition
       } = useSpeechRecognition();
-    
+
     // get products names
     const {data : products} = useQuery(['products'],fetchProducts);
-
+    
     useEffect(()=>{
         // set a timer when the user stops talking for 10 seconds it means he finished talking
         // if no word was recognized ask him again and delete the previous text in transcript = ""
         if(transcript){
-            setMyTextPhon(transcript.split(" ").map(item=>metaphone(item)));
+            setMyTextPhon(transcript.split(" ").map(item=>metaphone(pluralize.singular(item))));
         }
 
     },[transcript]);
     useEffect(()=>{
         if(products){
-            setNames(products.map(item=>metaphone(item.name)));
+            // first products with multiple words
+            setNames(products.map(item=>{
+                const splittedItem = item.name.split(" ");
+                if(splittedItem.length===1){
+                    return metaphone(item.name)  
+                }
+                return splittedItem.map(si=>metaphone(si));
+            }));//todo : for multi word products we get BG BURGR with space between words
         }
     },[products])
     
     const addToCart = (products, quantity) => {
-        // useCookies works similare to redux it shanges on every time we change the cookies so maybe if i didn't find a good reason to keep the cart in redux ill just use cookies
         if(products!==undefined){    
             if(quantity === undefined){
                 quantity = products.map(item=>1);
@@ -208,44 +215,11 @@ const Cart = ()=>{
             }
         }
     };
-    // const addToCart = (product, quantity=1) => {
-    //     // useCookies works similare to redux it shanges on every time we change the cookies so maybe if i didn't find a good reason to keep the cart in redux ill just use cookies
-    //     if(product!==undefined){
-    //         if(cookies.cart !== undefined && cookies.cart !== [] ){
-    //             //const unrepeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]!==product.id);
-    //             //const repeatedProduct = cookies.cart.filter(oldProduct=>oldProduct[0]===product.id);
-    //             const unrepeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]!==product.id);
-    //             const repeatedProduct = customization.cart.filter(oldProduct=>oldProduct[0]===product.id);
-                
-    //             let newQuantity = quantity;
-    //             if(repeatedProduct.length > 0){
-    //                 newQuantity = repeatedProduct[0][2]+quantity;
-    //             }
-    //             if(newQuantity>0){
-    //                 setCookies('cart', [...unrepeatedProduct, [product.id,product.name,newQuantity]], { path: '/', maxAge: 86400 });
-    //                 dispatch({ type: ADD_TO_CART , cart: [...unrepeatedProduct, [product.id,product.name,newQuantity]] });
-    //                 console.log("add toooo cart 1 ",product , " unrepeated : ",unrepeatedProduct);
-    //                 //////////////////npm i pluralize/////////////////////////
-    //             }
-    //             else{
-    //                 setCookies('cart', [...unrepeatedProduct], { path: '/', maxAge: 86400 });
-    //                 dispatch({ type: ADD_TO_CART , cart: [ ...unrepeatedProduct ] });
-    //                 console.log("add toooo cart 2",product);
-    //             }
-    //             console.log("hello ;;;;",customization.cart.length);
-    //         }
-    //         else {
-    //             setCookies('cart', [[product.id,product.name,quantity]], { path: '/', maxAge: 86400 });
-    //             dispatch({ type: ADD_TO_CART , cart: [[product.id,product.name,quantity]] });
-    //             console.log("add toooo cart 3",product);
-    //         }
-    //     }
-    // };
     const resetCart=()=>{
         setCookies('cart', [], { path: '/', maxAge: 1 });
         dispatch({ type: RESET_CART , cart: [] });
     }
-    
+
     useEffect(()=>{
         const tt = transcript.toLowerCase().split(" ");
         const numbers = {"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15};
@@ -259,35 +233,18 @@ const Cart = ()=>{
                     }
                     else if(numbers[item]!==undefined ){
                         quantities[quantities.length]= -numbers[item];
-                        console.log("hello im in ",numbers[item],"--",item);
-                        //addToCart(products[names.indexOf(item)],-1);
-                        //resetTranscript();
-                        //setMyTextPhon("");
                     }else if(names.includes(item)){
                         quantities[quantities.length]= -1;
                     }
                     return 0;
                 });
-                myTextPhon.map(item=>{ 
+                myTextPhon.map(item=>{
                     if(names.includes(item)){
-                        //console.log("index of ",names.indexOf(item));
-                        //console.log("prod :::::::",products[names.indexOf(item)]);
                         orderedProds[orderedProds.length] = products[names.indexOf(item)];
-                        //addToCart(products[names.indexOf(item)],-1);
-                        //resetTranscript();
-                        //setMyTextPhon("");
                     }
                     return 0;
                 });
                 console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
-                // orderedProds.map(item=>{
-                //     const n = quantities[orderedProds.indexOf(item)] 
-                //     addToCart(item,-n);
-                //     return 0;
-                // })
-                // addToCart(products[names.indexOf(item)],-1);
-                // resetTranscript();
-                // setMyTextPhon("");
             }
             else{
                 tt.map(item=>{
@@ -296,29 +253,56 @@ const Cart = ()=>{
                     }
                     else if(numbers[item]!==undefined){
                         quantities[quantities.length]= numbers[item];
-                        //addToCart(products[names.indexOf(item)],-1);
-                        //resetTranscript();
-                        //setMyTextPhon("");
                     }
                     return 0;
                 });
-                myTextPhon.map(item=>{ 
-                    if(names.includes(item)){
-                        //console.log("index of ",names.indexOf(item));
-                        //console.log("prod :::::::",products[names.indexOf(item)]);
-                        orderedProds[orderedProds.length] = products[names.indexOf(item)];
-                        //addToCart(products[names.indexOf(item)],-1);
-                        //resetTranscript();
-                        //setMyTextPhon("");
+                
+                console.log(";;;;;",names);
+                for(let i = 0; i<myTextPhon.length;i++){
+                    const indexOfItem = names.indexOf(myTextPhon[i])
+                    if(indexOfItem>=0){
+                        orderedProds[orderedProds.length] = products[indexOfItem];
                     }
-                    return 0;
-                });
-                // orderedProds.map(item=>{
-                //     console.log("item ",item);
-                //     const n = quantities[orderedProds.indexOf(item)]
-                //     addToCart(item,n);
-                //     return 0;
-                // })
+                    else{
+                        for(let j = 0; j<names.length; j++){
+                            let instanceOfProductTitle = 0;
+                            if(Array.isArray(names[j]) && myTextPhon[i] === names[j][0]){
+                                console.log("hello names ",names[j]);
+                                for(let k=i; k<(names[j].length)+i; k++){
+                                    console.log("inc ",instanceOfProductTitle);
+                                    if(names[j].includes(myTextPhon[k])){
+                                        instanceOfProductTitle++;
+                                    }
+                                }
+                                if(instanceOfProductTitle === names[j].length){
+                                    console.log("success");
+                                    orderedProds[orderedProds.length] = products[j];
+                                }
+                            }
+                        }
+                    }
+                }
+                // for(let i = 0; i<names.length; i++){
+                //     if(!Array.isArray(names[i])){
+                //         if(myTextPhon.includes(names[i])){
+                //             orderedProds[orderedProds.length] = products[i];
+                //         }
+                //     }
+                //     else{
+                //         let index = myTextPhon.indexOf(names[i][0])
+                //         let instanceOfProductTitle = 0;
+                //         if(index >= 0){
+                //             for(let j=index; j<(names[i].length)+index; j++){
+                //                 if(names[i].includes(myTextPhon[j])){
+                //                     instanceOfProductTitle++;
+                //                 }
+                //             }
+                //             if(instanceOfProductTitle === names[i].length){
+                //                 orderedProds[orderedProds.length] = products[i];
+                //             }
+                //         }
+                //     }
+                // }
             }
             addToCart(orderedProds,quantities);
             console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
@@ -330,7 +314,7 @@ const Cart = ()=>{
             resetTranscript();
             setMyTextPhon("");
         }
-        if(tt[tt.length-1]==="order" || (tt[tt.length-2]==="that's" && tt[tt.length-1]==="all")){
+        if(tt[tt.length-1]==="order" || (tt[tt.length-2]==="that's" && (tt[tt.length-1]==="all" || tt[tt.length-1]==="it"))){
             order();
             resetTranscript();
             setMyTextPhon("");
@@ -347,6 +331,7 @@ const Cart = ()=>{
     return(
 <MainCard>
     <Grid container spacing={gridSpacing}>
+        {/* <button onClick={()=>setTranscript("2 coffee 3 big mac please")}>click me</button> */}
     {/* <p>{transcript}</p> */}
         {/* {browserSupportsSpeechRecognition && 
         <div>
