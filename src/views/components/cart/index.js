@@ -7,6 +7,8 @@ import CartItem from "./CartItem";
 import config from 'config';
 import { useQuery } from "react-query";
 import { useSnackbar } from "notistack";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
 
 ///////////////////////////////// FOR SPEECH ////////////////////////////////
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
@@ -32,6 +34,18 @@ const fetchProducts = async (key)=>{
     } )
     return res.json();
 };
+const fetchLastOrder = async (key)=>{
+    const licensPlate = key.queryKey[1];
+    if(licensPlate!==null){
+        const res = await fetch(`${config.host}/api/v1/orders/lastOrder`,{
+            headers: {
+                'Content-Type' : 'application/json'
+            }
+        } )
+        return res.json();
+    }
+    return undefined; 
+};
 
 //here you need to use useSuery to get the product from database then pass it to the cartItem for display
 const Cart = ()=>{
@@ -42,9 +56,49 @@ const Cart = ()=>{
     const [city, setCity] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
     const msg = new SpeechSynthesisUtterance();
-    const [speech, setSpeech] = useState("hello and welcome to fast food, how can i help you ?");
+    const [speech, setSpeech] = useState(null);
+    const [licensPlate, setLicensPlate] = useState(null);
+    const [lastOrder, setLastOrder] = useState(null);
 
-    const {data} = useQuery(['cities'],fetchData)
+    const url = `${config.host}/ws`;
+    const {data} = useQuery(['cities'],fetchData);
+    useEffect(()=>{
+        const sock = new SockJS(url);
+        const stompClient = Stomp.over(sock);
+        stompClient.reconnect_delay=5000;
+        stompClient.connect({"Authorization": "token"},(frame)=>{
+            stompClient.subscribe(`/queue/to/mac1`
+                ,(response)=>{
+                let data = JSON.parse(response.body);
+                console.log("conversation that got the new message ",data);
+                msg.text = data.message;
+                if(data && data.id!==undefined&& data.id!==null){
+                    setLicensPlate(old=>data.id);
+                    setLastOrder(old=>data.lastOrder);
+                }
+                window.speechSynthesis.speak(msg)
+                }
+            );
+        })
+    },[url]);
+    
+    //const {data : lastOrder} = useQuery(['orders',licensPlate],fetchLastOrder);
+
+    // useEffect(()=>{
+    //     const sock = new SockJS(url);
+    //     const stompClient = Stomp.over(sock);
+    //     stompClient.reconnect_delay=5000;
+    //     stompClient.connect({"Authorization": null},(frame)=>{
+    //         stompClient.subscribe(`/queue/to/mac1`
+    //             ,(response)=>{
+    //                 console.log("recieved d",response);
+    //                 let data = JSON.parse(response.body);
+    //                 msg.text = data.message;
+    //                 window.speechSynthesis.speak(msg)
+    //             },{}
+    //         );
+    //     }) 
+    // },[url]);
 
     //console.log("cities ",data);
 
@@ -59,7 +113,7 @@ const Cart = ()=>{
     
             const productsDtoList = cookies.cart && cookies.cart.map((product)=>{return {id:product[0],quantity:product[2]}});
             const cityId = city;
-    
+            const carId = licensPlate
             const url = `${config.host}/api/v1/orders`;
             
             fetch(url, {
@@ -68,7 +122,7 @@ const Cart = ()=>{
                     'Content-Type': 'application/json',
                     'Authorization': cookies.smailToken
                 },
-                body: JSON.stringify({ productsDtoList,address,phoneNumber,cityId })
+                body: JSON.stringify({ productsDtoList,address,phoneNumber,cityId,carId:licensPlate })
                 })
                 .then((response) => {
                     console.log(response);
@@ -90,7 +144,7 @@ const Cart = ()=>{
                     setPhoneNumber("+212");
                     setCity(0);
                     setCookies('cart', [], { path: '/', maxAge: 86400 });
-                    setSpeech("would you like anything else")
+                    setSpeech(old=>"would you like anything else")
                 })
                 .catch((err) => {
                     console.error(err.message);
@@ -118,8 +172,10 @@ const Cart = ()=>{
     
 
     useEffect(() => {
-        msg.text = speech;
-        window.speechSynthesis.speak(msg)
+        if(speech!==null){
+            msg.text = speech;
+            window.speechSynthesis.speak(msg)
+        }
       }, [speech]);
 
     useEffect(()=>{
@@ -225,7 +281,15 @@ const Cart = ()=>{
         const numbers = {"one":1,"two":2,"three":3,"four":4,"five":5,"six":6,"seven":7,"eight":8,"nine":9,"ten":10,"eleven":11,"twelve":12,"thirteen":13,"fourteen":14,"fifteen":15};
         let quantities=[]
         let orderedProds = [];
+        
         if(myTextPhon[myTextPhon.length-1]===metaphone("please")){
+            if(lastOrder && myTextPhon[myTextPhon.length-2]===metaphone("yes")){
+                lastOrder.products.map(prod=>{
+                    orderedProds[orderedProds.length] = prod.product;
+                    quantities[quantities.length]= prod.quantity;
+                    return;
+                })
+            }
             if(tt.includes("remove")){
                 tt.map(item=>{
                     if(typeof item === "string" && !isNaN(item)){
@@ -282,27 +346,6 @@ const Cart = ()=>{
                         }
                     }
                 }
-                // for(let i = 0; i<names.length; i++){
-                //     if(!Array.isArray(names[i])){
-                //         if(myTextPhon.includes(names[i])){
-                //             orderedProds[orderedProds.length] = products[i];
-                //         }
-                //     }
-                //     else{
-                //         let index = myTextPhon.indexOf(names[i][0])
-                //         let instanceOfProductTitle = 0;
-                //         if(index >= 0){
-                //             for(let j=index; j<(names[i].length)+index; j++){
-                //                 if(names[i].includes(myTextPhon[j])){
-                //                     instanceOfProductTitle++;
-                //                 }
-                //             }
-                //             if(instanceOfProductTitle === names[i].length){
-                //                 orderedProds[orderedProds.length] = products[i];
-                //             }
-                //         }
-                //     }
-                // }
             }
             addToCart(orderedProds,quantities);
             console.log("ordered prods :",orderedProds, " quanitities : ", quantities, "trans : ", transcript);
@@ -321,7 +364,7 @@ const Cart = ()=>{
         }
         if(tt[tt.length-2]==="thank" && tt[tt.length-1]==="you"){
             order();
-            setSpeech("thank you, have a good day");
+            setSpeech(old=>"thank you, have a good day");
             resetTranscript();
             setMyTextPhon("");
         }
