@@ -7,6 +7,7 @@ import SearchSection from './SearchSection';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
+import logo from '../../../assets/images/redlogo.png';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -27,7 +28,9 @@ const Header = () => {
                 }}
             >
                 <Box component="span" sx={{ display: { xs: 'block', md: 'block' }, flexGrow: 1, fontSize:{ xs: '0.6em', md: '1em' } }}>
-                    <h2><Link to="/" style={{ textDecoration: 'none', color:'grey' }}><span style={{ color:"orangered" }}><b>Point</b></span>Of Sale</Link></h2>
+                    <Link to="/" style={{ textDecoration: 'none', color:'grey' }}>
+                        <img src={logo} width={150}/>
+                    </Link>
                 </Box>
             </Box>
 

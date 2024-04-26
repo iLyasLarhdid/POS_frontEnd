@@ -2,10 +2,11 @@ import React from 'react';
 import { useCookies } from "react-cookie";
 import { useQuery } from "react-query";
 import config from "config";
-import { Button, Card, Tooltip, tooltipClasses, Typography } from '@mui/material';
+import { Button, Card, Grid, Tooltip, tooltipClasses, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { styled } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
+import { gridSpacing } from 'store/constant';
 
 const HtmlTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -52,9 +53,13 @@ const ViewOrderPage = ()=>{
         autoComplete="off"
         noValidate
         >
+            <Grid container spacing={gridSpacing}>
+            <Grid item xs={12}>
+            <Grid container spacing={gridSpacing}>
             {data && data.content !== undefined && 
                 data.content.map(order=>{
                     return (
+                        <Grid item lg={2} md={3} sm={3} xs={6}>
                         <div key={order.id}>
                             <HtmlTooltip
                                 
@@ -92,17 +97,21 @@ const ViewOrderPage = ()=>{
                             >
                                 {order.orderState==="WAITING"
                                 ?
-                                    <Button style={{ marginTop:10, backgroundColor:"blue" }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button>
+                                    <Button style={{ marginTop:10, backgroundColor:"#096dd9" }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)} fullWidth>order N°{order.id}</Button>
                                 :
-                                    <Button style={{ marginTop:10, backgroundColor:"green" }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button>}
+                                    <Button style={{ marginTop:10, backgroundColor:"#4eb61b" }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)} fullWidth>order N°{order.id}</Button>}
 
                                 {/* <Button style={{ marginTop:10 }} variant="contained" color="secondary" onClick={()=>history.push(`/order/${order.id}`)}>order N°{order.id}</Button> */}
                             </HtmlTooltip>
                             
                         </div>
+                        </Grid>
                     );
                 })
             }
+            </Grid>
+            </Grid>
+            </Grid>
         </Box>
     </Card>
         

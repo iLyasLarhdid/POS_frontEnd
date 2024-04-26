@@ -93,11 +93,11 @@ const CartItem = ({ item }) => {
               <b style={{ textAlign:"right", color:"orangered", fontSize:"1.2rem" }}>{data.name}</b>
               {data.discount ? 
                   <>
-                  <del style={{ textAlign:"right", color:"orange" }}> {data.price}DH</del>
-                  <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> {data.price-(data.price*data.discount.percentage/100)}DH</b>
+                  <del style={{ textAlign:"right", color:"orange" }}> ${data.price}</del>
+                  <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> ${data.price-(data.price*data.discount.percentage/100)}</b>
                   </>
               :
-                  <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> {data.price}DH</b>
+                  <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> ${data.price}</b>
               }
           </Typography>
           <Typography>

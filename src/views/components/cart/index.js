@@ -57,6 +57,7 @@ const Cart = ()=>{
     const { enqueueSnackbar } = useSnackbar();
     const msg = new SpeechSynthesisUtterance();
     const [speech, setSpeech] = useState(null);
+    const [spokenText, setSpokenText] = useState(null);
     const [licensPlate, setLicensPlate] = useState(null);
     const [lastOrder, setLastOrder] = useState(null);
 
@@ -292,19 +293,26 @@ const Cart = ()=>{
                 })
             }
             if(tt.includes("remove")){
+                console.log("inside remove")
                 tt.map(item=>{
                     if(typeof item === "string" && !isNaN(item)){
+                        console.log("undefined numbe2222r")
                         quantities[quantities.length]= -parseInt(item);
                     }
                     else if(numbers[item]!==undefined ){
+                        console.log("undefined number")
                         quantities[quantities.length]= -numbers[item];
-                    }else if(names.includes(item)){
+                    }else if(names.includes(metaphone(pluralize.singular(item)))){
+                        console.log("undefined number2222")
                         quantities[quantities.length]= -1;
                     }
+                    
+                    console.log("hahahahhaha names:",names, "item: ",metaphone(pluralize.singular(item)))
                     return 0;
                 });
                 myTextPhon.map(item=>{
                     if(names.includes(item)){
+                        console.log("names:",names, "item: ",item)
                         orderedProds[orderedProds.length] = products[names.indexOf(item)];
                     }
                     return 0;
@@ -353,7 +361,7 @@ const Cart = ()=>{
             resetTranscript();
             setMyTextPhon("");
         }
-        if(tt[tt.length-1]==="reset"){
+        if(tt[tt.length-1]==="reset" || tt[tt.length-1]==="cancel" || (tt[tt.length-2]==="remove" && tt[tt.length-1]==="everything")){
             resetCart();
             resetTranscript();
             setMyTextPhon("");
@@ -374,9 +382,10 @@ const Cart = ()=>{
 
     return(
 <MainCard>
+    <p>{transcript}</p>
     <Grid container spacing={gridSpacing}>
         {/* <button onClick={()=>setTranscript("2 coffee 3 big mac please")}>click me</button> */}
-    {/* <p>{transcript}</p> */}
+        
         {/* {browserSupportsSpeechRecognition && 
         <div>
             <p>Microphone: {listening ? 'on' : 'off'}</p>

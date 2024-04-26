@@ -88,11 +88,11 @@ const ProductCard = ({product})=>{
                     <b style={{ textAlign:"right", color:"orangered", fontSize:"1.2rem" }}>{product.name}</b>
                     {product.discount ? 
                         <>
-                        <del style={{ textAlign:"right", color:"orange" }}> {product.price}DH</del>
-                        <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> {product.price-(product.price*product.discount.percentage/100)}DH</b>
+                        <del style={{ textAlign:"right", color:"orange" }}> ${product.price}</del>
+                        <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> ${product.price-(product.price*product.discount.percentage/100)}</b>
                         </>
                     :
-                        <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> {product.price}DH</b>
+                        <b style={{ textAlign:"right", color:"orange", fontSize:"1.5rem" }}> ${product.price}</b>
                     }
                 </Typography>
                 <Typography style={{ position:"absolute", top:"1px", right:"1px" }}>{product.discount && <b><Chip label={`Discount ${product.discount.percentage}%`} color="warning" /></b>}</Typography>

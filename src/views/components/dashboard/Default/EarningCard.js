@@ -144,7 +144,7 @@ const EarningCard = ({ isLoading, data }) => {
                                 <Grid container alignItems="center">
                                     <Grid item>
                                         <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                                            {data && data.map(item=>item.priceDay).reduce((o,n)=>o+n)} DH
+                                            ${data && data.map(item=>item.priceDay).reduce((o,n)=>o+n)}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
